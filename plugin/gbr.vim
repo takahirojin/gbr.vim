@@ -13,7 +13,16 @@ let g:loaded_gbr_vim = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! Gbr call gbr#list()
+let g:gbr_no_default_key_mappings = 0
+let g:gbr_buf_max_height = 15
+
+command! Gbr call gbr#gbr()
+command! GbrSwitch call gbr#checkout()
+command! GbrDelete call gbr#delete()
+
+nnoremap <silent> <Plug>(gbr_gbr) :<C-u>Gbr<CR>
+nnoremap <silent> <Plug>(gbr_checkout) :<C-u>GbrSwitch<CR>
+nnoremap <silent> <Plug>(gbr_delete) :<C-u>GbrDelete<CR>
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
