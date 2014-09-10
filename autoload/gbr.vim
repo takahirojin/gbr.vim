@@ -18,6 +18,7 @@ function! gbr#gbr()
   exec 'silent noautocmd ' . s:height . 'new'
   call setline(1, s:branch_list)
   setlocal nomodifiable
+  syntax match Title /^\*\s.*$/
   call s:gbr_default_key_mappings()
 endfunction
 
