@@ -33,10 +33,8 @@ function! gbr#checkout()
     return
   endif
   let s:result = system('git checkout ' . s:branch_name)
-  for mes in split(s:result, "\n")
-    echomsg mes
-  endfor
   exec ":bd!"
+  call gbr#echomsg(s:result)
 endfunction
 
 function! gbr#delete()
@@ -50,10 +48,9 @@ function! gbr#delete()
   endif
   redraw
   let s:result = system('git branch -d ' . s:branch_name)
-  for mes in split(s:result, "\n")
-    echomsg mes
-  endfor
   exec ":bd!"
+  call gbr#echomsg(s:result)
+  call gbr#gbr()
 endfunction
 
 function! gbr#current_branch_top(branch_list)
@@ -67,6 +64,12 @@ function! gbr#current_branch_top(branch_list)
   endfor
   call insert(s:list, s:current, 0)
   return s:list
+endfunction
+
+function! gbr#echomsg(result)
+  for mes in split(a:result, "\n")
+    echomsg mes
+  endfor
 endfunction
 
 function! s:gbr_default_key_mappings()
