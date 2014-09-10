@@ -11,6 +11,10 @@ set cpo&vim
 function! gbr#gbr()
   let s:height = g:gbr_buf_max_height
   let s:branch_list = split(system('git branch'), "\n")
+  if g:gbr_current_branch_top
+    let s:branch_list = gbr#current_branch_top(s:branch_list)
+  endif
+
   let s:count = len(s:branch_list)
   if s:count < s:height
     let s:height = s:count
@@ -50,6 +54,19 @@ function! gbr#delete()
     echomsg mes
   endfor
   exec ":bd!"
+endfunction
+
+function! gbr#current_branch_top(branch_list)
+  let s:list = []
+  for branch in a:branch_list
+    if branch =~# "*"
+      let s:current = branch
+    else
+      call add(s:list, branch)
+    endif
+  endfor
+  call insert(s:list, s:current, 0)
+  return s:list
 endfunction
 
 function! s:gbr_default_key_mappings()
