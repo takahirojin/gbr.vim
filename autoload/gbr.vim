@@ -8,6 +8,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let g:buf_name = '[gbr]'
+
 function! gbr#gbr()
   let s:height = g:gbr_buf_max_height
   let s:branch_list = split(system('git branch'), "\n")
@@ -19,35 +21,29 @@ function! gbr#gbr()
   if s:count < s:height
     let s:height = s:count
   endif
-  exec 'silent noautocmd ' . s:height . 'new'
+  exec 'silent noautocmd ' . s:height . 'new' . ' ' . g:buf_name
   call setline(1, s:branch_list)
+  setlocal buftype=nofile bufhidden=hide noswapfile
+  setlocal nomodified
   setlocal nomodifiable
   syntax match Title /^\*\s.*$/
   call s:gbr_default_key_mappings()
 endfunction
 
 function! gbr#checkout()
-  let s:branch_name = substitute(getline("."), '\s', '', 'g')
-  if s:branch_name =~? "*"
-    echomsg "you already switched."
-    return
-  endif
+  let s:branch_name = gbr#get_target_branch()
   let s:result = system('git checkout ' . s:branch_name)
   exec ":bd!"
   call gbr#echomsg(s:result)
 endfunction
 
-function! gbr#delete()
-  let s:branch_name = substitute(getline("."), '\s', '', 'g')
-  if s:branch_name =~? "*"
-    echomsg "switch another branch, before delete the branch."
-    return
-  endif
-  if input("are you sure, delete " . s:branch_name . " [y/n] : ") != 'y'
+function! gbr#delete(option) abort
+  let s:branch_name = gbr#get_target_branch()
+  if input("are you sure, delete " . a:option . ' ' . s:branch_name . " [y/n] : ") != 'y'
     return
   endif
   redraw
-  let s:result = system('git branch -d ' . s:branch_name)
+  let s:result = gbr#cmd_branch(a:option, s:branch_name)
   exec ":bd!"
   call gbr#echomsg(s:result)
   call gbr#gbr()
@@ -72,13 +68,30 @@ function! gbr#echomsg(result)
   endfor
 endfunction
 
+function! gbr#cmd_branch(option, branch_name)
+  " let s:branch_name = substitute(getline("."), '\(^\*\|\s\)', '', 'g')
+  let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
+  return s:result
+endfunction
+
+function! gbr#get_target_branch()
+  return substitute(getline("."), '\(^\*\|\s\)', '', 'g')
+endfunction
+
+function! gbr#create()
+endfunction
+
 function! s:gbr_default_key_mappings()
   if g:gbr_no_default_key_mappings
     return
   endif
   augroup gbr
-    nmap <silent> <buffer> <CR> <Plug>(gbr_checkout)
-    nmap <silent> <buffer> d <Plug>(gbr_delete)
+    " nnoremap <silent> <buffer> <CR> <Plug>(gbr_checkout)
+    " nmap <silent> <buffer> d <Plug>(gbr_delete)
+    nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
+    nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
+    nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
+    nnoremap <silent> <buffer> c :<C-u>call gbr#create()<CR>
     nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
   augroup END
 endfunction
