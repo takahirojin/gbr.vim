@@ -69,7 +69,6 @@ function! gbr#echomsg(result)
 endfunction
 
 function! gbr#cmd_branch(option, branch_name)
-  " let s:branch_name = substitute(getline("."), '\(^\*\|\s\)', '', 'g')
   let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
   return s:result
 endfunction
@@ -86,8 +85,6 @@ function! s:gbr_default_key_mappings()
     return
   endif
   augroup gbr
-    " nnoremap <silent> <buffer> <CR> <Plug>(gbr_checkout)
-    " nmap <silent> <buffer> d <Plug>(gbr_delete)
     nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
     nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
     nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
