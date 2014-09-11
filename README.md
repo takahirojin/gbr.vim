@@ -14,8 +14,9 @@ Shows your git branch list
 
 * display current branch on top of the list
 
-  let g:gbr_current_branch_top = 1
+        let g:gbr_current_branch_top = 1
 
 * set maximum window height
 
-  let g:gbr_window_height = 20
+        let g:gbr_window_height = 20
+
