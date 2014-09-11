@@ -11,7 +11,7 @@ set cpo&vim
 let g:buf_name = '[gbr]'
 
 function! gbr#gbr()
-  let s:height = g:gbr_buf_max_height
+  let s:height = g:gbr_window_height
   let s:branch_list = split(system('git branch'), "\n")
   if g:gbr_current_branch_top
     let s:branch_list = gbr#current_branch_top(s:branch_list)
