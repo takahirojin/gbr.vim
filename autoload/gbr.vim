@@ -34,7 +34,7 @@ function! gbr#checkout()
   let s:branch_name = gbr#get_target_branch()
   let s:result = system('git checkout ' . s:branch_name)
   exec ":bd!"
-  call gbr#echomsg(s:result)
+  echo s:result
 endfunction
 
 function! gbr#delete(option) abort
@@ -43,9 +43,9 @@ function! gbr#delete(option) abort
     return
   endif
   redraw
-  let s:result = gbr#cmd_branch(a:option, s:branch_name)
+  let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
   exec ":bd!"
-  call gbr#echomsg(s:result)
+  echo s:result
   call gbr#gbr()
 endfunction
 
@@ -62,22 +62,40 @@ function! gbr#current_branch_top(branch_list)
   return s:list
 endfunction
 
-function! gbr#echomsg(result)
-  for mes in split(a:result, "\n")
-    echomsg mes
-  endfor
-endfunction
+" function! gbr#echomsg(result)
+  " for mes in split(a:result, "\n")
+    " echomsg mes
+  " endfor
+" endfunction
 
-function! gbr#cmd_branch(option, branch_name)
-  let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
-  return s:result
-endfunction
+" function! gbr#cmd_branch(option, branch_name)
+  " let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
+  " return s:result
+" endfunction
 
 function! gbr#get_target_branch()
   return substitute(getline("."), '\(^\*\|\s\)', '', 'g')
 endfunction
 
-function! gbr#create()
+function! gbr#create(option) abort
+  let s:new_branch_name = input("input new-branch-name : ")
+  if s:new_branch_name == ""
+    return
+  endif
+
+  redraw
+  let s:start_point = gbr#get_target_branch()
+  if a:option ==# "c"
+    let s:result = system('git branch ' . s:new_branch_name . ' ' . s:start_point)
+    if s:result == ""
+      echo "created new branch " . s:new_branch_name
+    endif
+  elseif a:option ==# "cc"
+    let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
+    echo s:result
+  endif
+  exec ":bd!"
+  call gbr#gbr()
 endfunction
 
 function! s:gbr_default_key_mappings()
@@ -86,9 +104,10 @@ function! s:gbr_default_key_mappings()
   endif
   augroup gbr
     nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
+    nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
+    nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
     nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
     nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
-    nnoremap <silent> <buffer> c :<C-u>call gbr#create()<CR>
     nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
   augroup END
 endfunction
