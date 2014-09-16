@@ -43,7 +43,7 @@ function! gbr#delete(option) abort
     return
   endif
   redraw
-  let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
+  let s:result = system('git branch ' . a:option . ' ' . s:branch_name)
   exec ":bd!"
   echo s:result
   call gbr#gbr()
