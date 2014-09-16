@@ -1,6 +1,6 @@
 # gbr.vim
 
-Shows your git branch list
+Show git branch list
 
 ## Usage:
 
