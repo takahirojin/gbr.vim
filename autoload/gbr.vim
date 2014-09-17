@@ -77,11 +77,26 @@ function! gbr#create(option) abort
   if a:option ==# "c"
     let s:result = system('git branch ' . s:new_branch_name . ' ' . s:start_point)
     if s:result == ""
-      echo "created new branch " . s:new_branch_name
+      echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'"
     endif
   elseif a:option ==# "cc"
     let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
     echo s:result
+    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'"
+  elseif a:option ==# "C"
+    let s:resCheckout = system('git checkout ' . s:start_point)
+    if v:shell_error
+      echo s:resCheckout
+      return
+    endif
+    let s:resPull = system('git pull')
+    if v:shell_error
+      echo s:resPull
+      return
+    endif
+    let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
+    echo s:result
+    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "', before 'git checkout " . s:start_point . " && git pull'"
   endif
   exec ":bd!"
   call gbr#gbr()
@@ -95,6 +110,7 @@ function! s:gbr_default_key_mappings()
     nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
     nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
     nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
+    nnoremap <silent> <buffer> C :<C-u>call gbr#create("C")<CR>
     nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
     nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
     nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
