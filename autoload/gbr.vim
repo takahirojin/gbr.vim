@@ -62,17 +62,6 @@ function! gbr#current_branch_top(branch_list)
   return s:list
 endfunction
 
-" function! gbr#echomsg(result)
-  " for mes in split(a:result, "\n")
-    " echomsg mes
-  " endfor
-" endfunction
-
-" function! gbr#cmd_branch(option, branch_name)
-  " let s:result = system('git branch ' . a:option . ' ' . a:branch_name)
-  " return s:result
-" endfunction
-
 function! gbr#get_target_branch()
   return substitute(getline("."), '\(^\*\|\s\)', '', 'g')
 endfunction

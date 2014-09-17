@@ -1,0 +1,41 @@
+*gbr.txt* Show git branch list for Vim
+
+Version: 0.0
+Author: takahiro jinno
+License: MIT License
+
+==============================================================================
+CONTENTS                                                       *gbr-contents*
+
+Usage                                          |gbr-usage|
+Tips                                           |gbr-tips|
+
+*gbr.vim* is a showing git-branch for Vim
+
+==============================================================================
+USAGE                                                          *gbr-usage*
+
+:Gbr      Showing git-branch in the window.
+	  Following the key mappings, work on the cursor line branch-name
+
+          <Enter> switch the branch
+          c       create a new branch
+          cc      create and switch a new branch
+          d       delete a branch (as same as "-d" options)
+          D       delete a branch (as same as "-D" options)
+	  q       close branch list
+
+==============================================================================
+Tips                                                           *gbr-tips*
+
+- display current branch on top of the list
+>
+    let g:gbr_current_branch_top = 1
+<
+
+- set maximum window height
+>
+    let g:gbr_window_height = 20
+<
+
+vim:tw=78:sw=4:ts=8:ft=help:norl:noet:
