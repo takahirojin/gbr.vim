@@ -8,6 +8,7 @@ Show git branch list
 * Press `Enter` to switch branch which you choose.
 * Press `c` to create a new branch.
 * Press `cc` to create and switch a new branch.
+* Press `C` to create and switch a new branch from refs/heads/branch-name
 * Press `d` to delete a branch. as same as "-d" options
 * Press `D` to delete a branch. as same as "-D" options
 * Press `q` to close branch list.

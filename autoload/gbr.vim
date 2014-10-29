@@ -39,7 +39,7 @@ endfunction
 
 function! gbr#delete(option) abort
   let s:branch_name = gbr#get_target_branch()
-  if input("are you sure, delete " . a:option . ' ' . s:branch_name . " [y/n] : ") != 'y'
+  if input("Are you sure, delete " . a:option . ' ' . s:branch_name . " [y/n] : ") != 'y'
     return
   endif
   redraw
@@ -67,7 +67,7 @@ function! gbr#get_target_branch()
 endfunction
 
 function! gbr#create(option) abort
-  let s:new_branch_name = input("input new-branch-name : ")
+  let s:new_branch_name = input("Input new-branch-name : ")
   if s:new_branch_name == ""
     return
   endif
@@ -96,7 +96,7 @@ function! gbr#create(option) abort
     endif
     let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
     echo s:result
-    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "', before 'git checkout " . s:start_point . " && git pull'"
+    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'\nbefore 'git checkout " . s:start_point . " && git pull'"
   endif
   exec ":bd!"
   call gbr#gbr()
@@ -106,15 +106,13 @@ function! s:gbr_default_key_mappings()
   if g:gbr_no_default_key_mappings
     return
   endif
-  augroup gbr
-    nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
-    nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
-    nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
-    nnoremap <silent> <buffer> C :<C-u>call gbr#create("C")<CR>
-    nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
-    nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
-    nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
-  augroup END
+  nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
+  nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
+  nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
+  nnoremap <silent> <buffer> C :<C-u>call gbr#create("C")<CR>
+  nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
+  nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
+  nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
 endfunction
 
 let &cpo = s:save_cpo

@@ -21,6 +21,7 @@ USAGE                                                          *gbr-usage*
           <Enter> switch the branch
           c       create a new branch
           cc      create and switch a new branch
+	  C       create and switch a new branch from refs/heads/branch-name
           d       delete a branch (as same as "-d" options)
           D       delete a branch (as same as "-D" options)
 	  q       close branch list
