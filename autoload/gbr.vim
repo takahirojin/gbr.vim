@@ -10,11 +10,11 @@ set cpo&vim
 
 let g:buf_name = '[gbr]'
 
-function! gbr#gbr()
+function! gbr#gbr() abort
   let s:height = g:gbr_window_height
   let s:branch_list = split(system('git branch'), "\n")
   if g:gbr_current_branch_top
-    let s:branch_list = gbr#current_branch_top(s:branch_list)
+    let s:branch_list = s:current_branch_top(s:branch_list)
   endif
 
   let s:count = len(s:branch_list)
@@ -30,15 +30,15 @@ function! gbr#gbr()
   call s:gbr_default_key_mappings()
 endfunction
 
-function! gbr#checkout()
-  let s:branch_name = gbr#get_target_branch()
+function! gbr#checkout() abort
+  let s:branch_name = s:get_target_branch()
   let s:result = system('git checkout ' . s:branch_name)
   exec ":bd!"
   echo s:result
 endfunction
 
 function! gbr#delete(option) abort
-  let s:branch_name = gbr#get_target_branch()
+  let s:branch_name = s:get_target_branch()
   if input("Are you sure, delete " . a:option . ' ' . s:branch_name . " [y/n] : ") != 'y'
     return
   endif
@@ -49,7 +49,7 @@ function! gbr#delete(option) abort
   call gbr#gbr()
 endfunction
 
-function! gbr#current_branch_top(branch_list)
+function! s:current_branch_top(branch_list) abort
   let s:list = []
   for branch in a:branch_list
     if branch =~# "*"
@@ -62,7 +62,7 @@ function! gbr#current_branch_top(branch_list)
   return s:list
 endfunction
 
-function! gbr#get_target_branch()
+function! s:get_target_branch()
   return substitute(getline("."), '\(^\*\|\s\)', '', 'g')
 endfunction
 
@@ -73,7 +73,7 @@ function! gbr#create(option) abort
   endif
 
   redraw
-  let s:start_point = gbr#get_target_branch()
+  let s:start_point = s:get_target_branch()
   if a:option ==# "c"
     let s:result = system('git branch ' . s:new_branch_name . ' ' . s:start_point)
     if s:result == ""
@@ -113,6 +113,37 @@ function! s:gbr_default_key_mappings()
   nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
   nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
   nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
+endfunction
+
+function! gbr#truncate_branch() abort
+  let s:branch_list = []
+  for branch in split(system('git branch'), "\n")
+    let s:branch = substitute(branch, " ", "", "g")
+    call add(s:branch_list, s:branch)
+  endfor
+  let s:exclusion_branch = g:gbr_exclusion_branch
+  let s:truncate_branch_list = s:filter_branch(s:branch_list, s:exclusion_branch)
+  if !empty(s:truncate_branch_list)
+    let s:result = system('git branch -d ' . join(s:truncate_branch_list, " "))
+    if bufname("[gbr]") == "[gbr]"
+      redraw
+      exec ":bd!"
+      echo s:result
+      call gbr#gbr()
+    else
+      echo s:result
+    endif
+  else
+    echo "Nothing any target branch..."
+  endif
+endfunction
+
+function! s:filter_branch(truncate_branch, exclusion_branch) abort
+  call filter(a:truncate_branch, 'v:val !~# "*"')
+  if !empty(a:exclusion_branch)
+    call filter(a:truncate_branch, 'index(a:exclusion_branch, v:val) == -1')
+  endif
+  return a:truncate_branch
 endfunction
 
 let &cpo = s:save_cpo

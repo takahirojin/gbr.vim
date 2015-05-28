@@ -13,6 +13,8 @@ Show git branch list
 * Press `D` to delete a branch. as same as "-D" options
 * Press `q` to close branch list.
 
+* Run `:GbrTruncateBranch` to delete branch exclude current branch
+
 ## Tips:
 
 * display current branch on top of the list
@@ -22,4 +24,8 @@ Show git branch list
 * set maximum window height
 
         let g:gbr_window_height = 20
+
+* set exclude branches when using GbrTruncateBranch command
+
+        let g:gbr_exclusion_branch = ['master']
 

@@ -1,6 +1,6 @@
 *gbr.txt* Show git branch list for Vim
 
-Version: 0.0
+Version: 1.0
 Author: takahiro jinno
 License: MIT License
 
@@ -26,6 +26,10 @@ USAGE                                                          *gbr-usage*
           D       delete a branch (as same as "-D" options)
 	  q       close branch list
 
+
+:GbrTruncateBranch      Delete git-branch exclude current branch.
+
+
 ==============================================================================
 Tips                                                           *gbr-tips*
 
@@ -37,6 +41,11 @@ Tips                                                           *gbr-tips*
 - set maximum window height
 >
     let g:gbr_window_height = 20
+
+
+- set exclude branches when using GbrTruncateBranch command
+>
+    let g:gbr_exclusion_branch = ['master']
 <
 
 vim:tw=78:sw=4:ts=8:ft=help:norl:noet:
