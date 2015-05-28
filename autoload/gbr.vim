@@ -116,11 +116,7 @@ function! s:gbr_default_key_mappings()
 endfunction
 
 function! gbr#truncate_branch() abort
-  let s:branch_list = []
-  for branch in split(system('git branch'), "\n")
-    let s:branch = substitute(branch, " ", "", "g")
-    call add(s:branch_list, s:branch)
-  endfor
+  let s:branch_list = split(substitute(system('git branch'), '\s', '', 'g'), "\n")
   let s:exclusion_branch = g:gbr_exclusion_branch
   let s:truncate_branch_list = s:filter_branch(s:branch_list, s:exclusion_branch)
   if !empty(s:truncate_branch_list)
