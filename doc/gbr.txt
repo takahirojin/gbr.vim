@@ -41,7 +41,7 @@ Tips                                                           *gbr-tips*
 - set maximum window height
 >
     let g:gbr_window_height = 20
-
+<
 
 - set exclude branches when using GbrTruncateBranch command
 >
