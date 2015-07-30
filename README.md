@@ -9,6 +9,7 @@ Show git branch list
 * Press `c` to create a new branch.
 * Press `cc` to create and switch a new branch.
 * Press `C` to create and switch a new branch from refs/heads/branch-name
+* Press `m` to rename a branch. as same as "-m" options
 * Press `d` to delete a branch. as same as "-d" options
 * Press `D` to delete a branch. as same as "-D" options
 * Press `q` to close branch list.
@@ -27,5 +28,5 @@ Show git branch list
 
 * set exclude branches when using GbrTruncateBranch command
 
-        let g:gbr_exclusion_branch = ['master']
+        let g:gbr_exclusion_branch = ['foo', 'bar']
 

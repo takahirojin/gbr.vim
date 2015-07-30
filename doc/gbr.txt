@@ -22,6 +22,7 @@ USAGE                                                          *gbr-usage*
           c       create a new branch
           cc      create and switch a new branch
 	  C       create and switch a new branch from refs/heads/branch-name
+	  m       rename a branch (as same as "-m" options)
           d       delete a branch (as same as "-d" options)
           D       delete a branch (as same as "-D" options)
 	  q       close branch list
@@ -45,7 +46,7 @@ Tips                                                           *gbr-tips*
 
 - set exclude branches when using GbrTruncateBranch command
 >
-    let g:gbr_exclusion_branch = ['master']
+    let g:gbr_exclusion_branch = ['foo', 'bar']
 <
 
 vim:tw=78:sw=4:ts=8:ft=help:norl:noet:

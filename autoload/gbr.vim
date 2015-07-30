@@ -102,6 +102,22 @@ function! gbr#create(option) abort
   call gbr#gbr()
 endfunction
 
+function! gbr#rename() abort
+  let s:oldbranch = s:get_target_branch()
+  let s:new_branch_name = input("Rename from '". s:oldbranch . "'\nInput new-branch-name : ")
+  if s:new_branch_name == ""
+    return
+  endif
+
+  redraw
+  let s:result = system('git branch -m ' . s:oldbranch . ' ' . s:new_branch_name)
+  if s:result == ""
+    echo "Rename '" . s:new_branch_name . "' from '" . s:oldbranch . "'"
+  endif
+  exec ":bd!"
+  call gbr#gbr()
+endfunction
+
 function! s:gbr_default_key_mappings()
   if g:gbr_no_default_key_mappings
     return
@@ -110,6 +126,7 @@ function! s:gbr_default_key_mappings()
   nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
   nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
   nnoremap <silent> <buffer> C :<C-u>call gbr#create("C")<CR>
+  nnoremap <silent> <buffer> m :<C-u>call gbr#rename()<CR>
   nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
   nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
   nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
