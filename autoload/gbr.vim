@@ -12,6 +12,12 @@ const buf_name = '[gbr]'
 export def Gbr()
   var height = g:gbr_window_height
   var branch_list = split(system('git branch'), "\n")
+  if v:shell_error
+    echohl ErrorMsg
+    echo 'gbr: not a git repository'
+    echohl None
+    return
+  endif
   if g:gbr_current_branch_top
     branch_list = CurrentBranchTop(branch_list)
   endif
@@ -31,8 +37,8 @@ enddef
 
 export def Checkout()
   var branch_name = GetTargetBranch()
-  var result = system('git checkout ' .. branch_name)
-  execute ':bd!'
+  var result = system('git checkout ' .. shellescape(branch_name))
+  execute 'bd!'
   echo result
 enddef
 
@@ -42,8 +48,8 @@ export def Delete(option: string)
     return
   endif
   redraw
-  var result = system('git branch ' .. option .. ' ' .. branch_name)
-  execute ':bd!'
+  var result = system('git branch ' .. option .. ' ' .. shellescape(branch_name))
+  execute 'bd!'
   echo result
   Gbr()
 enddef
@@ -74,17 +80,18 @@ export def Create(option: string)
 
   redraw
   var start_point = GetTargetBranch()
+  var result: string
   if option ==# 'c'
-    var result = system('git branch ' .. new_branch_name .. ' ' .. start_point)
+    result = system('git branch ' .. shellescape(new_branch_name) .. ' ' .. shellescape(start_point))
     if result == ''
       echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'"
     endif
   elseif option ==# 'cc'
-    var result = system('git checkout -b ' .. new_branch_name .. ' ' .. start_point)
+    result = system('git checkout -b ' .. shellescape(new_branch_name) .. ' ' .. shellescape(start_point))
     echo result
     echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'"
   elseif option ==# 'C'
-    var res_checkout = system('git checkout ' .. start_point)
+    var res_checkout = system('git checkout ' .. shellescape(start_point))
     if v:shell_error
       echo res_checkout
       return
@@ -94,11 +101,11 @@ export def Create(option: string)
       echo res_pull
       return
     endif
-    var result = system('git checkout -b ' .. new_branch_name .. ' ' .. start_point)
+    result = system('git checkout -b ' .. shellescape(new_branch_name) .. ' ' .. shellescape(start_point))
     echo result
     echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'\nbefore 'git checkout " .. start_point .. " && git pull'"
   endif
-  execute ':bd!'
+  execute 'bd!'
   Gbr()
 enddef
 
@@ -110,11 +117,11 @@ export def Rename()
   endif
 
   redraw
-  var result = system('git branch -m ' .. oldbranch .. ' ' .. new_branch_name)
+  var result = system('git branch -m ' .. shellescape(oldbranch) .. ' ' .. shellescape(new_branch_name))
   if result == ''
     echo "Rename '" .. new_branch_name .. "' from '" .. oldbranch .. "'"
   endif
-  execute ':bd!'
+  execute 'bd!'
   Gbr()
 enddef
 
@@ -134,13 +141,14 @@ enddef
 
 export def TruncateBranch()
   var branch_list = split(substitute(system('git branch'), '\s', '', 'g'), "\n")
-  var exclusion_branch: list<any> = g:gbr_exclusion_branch
+  var exclusion_branch: list<string> = g:gbr_exclusion_branch
   var truncate_branch_list = FilterBranch(branch_list, exclusion_branch)
   if !empty(truncate_branch_list)
-    var result = system('git branch -d ' .. join(truncate_branch_list, ' '))
+    var escaped = map(copy(truncate_branch_list), (_, v) => shellescape(v))
+    var result = system('git branch -d ' .. join(escaped, ' '))
     if bufname('[gbr]') == '[gbr]'
       redraw
-      execute ':bd!'
+      execute 'bd!'
       echo result
       Gbr()
     else
@@ -151,7 +159,7 @@ export def TruncateBranch()
   endif
 enddef
 
-def FilterBranch(truncate_branch: list<string>, exclusion_branch: list<any>): list<string>
+def FilterBranch(truncate_branch: list<string>, exclusion_branch: list<string>): list<string>
   var branches = copy(truncate_branch)
   filter(branches, (_, val) => val !~# '\*')
   if !empty(exclusion_branch)
