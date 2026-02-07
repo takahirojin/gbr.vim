@@ -1,8 +1,9 @@
 *gbr.txt* Show git branch list for Vim
 
-Version: 1.0
+Version: 2.0
 Author: takahiro jinno
 License: MIT License
+Requires: Vim 9.0+
 
 ==============================================================================
 CONTENTS                                                       *gbr-contents*

@@ -1,163 +1,161 @@
-" =============================================================================
-" Filename: autoload/gbr.vim
-" Version: 1.0
-" Author: takahiro jinno
-" License: MIT License
-" =============================================================================
+vim9script
 
-let s:save_cpo = &cpo
-set cpo&vim
+# =============================================================================
+# Filename: autoload/gbr.vim
+# Version: 2.0
+# Author: takahiro jinno
+# License: MIT License
+# =============================================================================
 
-let g:buf_name = '[gbr]'
+const buf_name = '[gbr]'
 
-function! gbr#gbr() abort
-  let s:height = g:gbr_window_height
-  let s:branch_list = split(system('git branch'), "\n")
+export def Gbr()
+  var height = g:gbr_window_height
+  var branch_list = split(system('git branch'), "\n")
   if g:gbr_current_branch_top
-    let s:branch_list = s:current_branch_top(s:branch_list)
+    branch_list = CurrentBranchTop(branch_list)
   endif
 
-  let s:count = len(s:branch_list)
-  if s:count < s:height
-    let s:height = s:count
+  var count = len(branch_list)
+  if count < height
+    height = count
   endif
-  exec 'silent noautocmd ' . s:height . 'new' . ' ' . g:buf_name
-  call setline(1, s:branch_list)
+  execute 'silent noautocmd :' .. height .. 'new ' .. buf_name
+  setline(1, branch_list)
   setlocal buftype=nofile bufhidden=hide noswapfile
   setlocal nomodified
   setlocal nomodifiable
   syntax match Title /^\*\s.*$/
-  call s:gbr_default_key_mappings()
-endfunction
+  SetDefaultKeyMappings()
+enddef
 
-function! gbr#checkout() abort
-  let s:branch_name = s:get_target_branch()
-  let s:result = system('git checkout ' . s:branch_name)
-  exec ":bd!"
-  echo s:result
-endfunction
+export def Checkout()
+  var branch_name = GetTargetBranch()
+  var result = system('git checkout ' .. branch_name)
+  execute ':bd!'
+  echo result
+enddef
 
-function! gbr#delete(option) abort
-  let s:branch_name = s:get_target_branch()
-  if input("Are you sure, delete " . a:option . ' ' . s:branch_name . " [y/n] : ") != 'y'
+export def Delete(option: string)
+  var branch_name = GetTargetBranch()
+  if input('Are you sure, delete ' .. option .. ' ' .. branch_name .. ' [y/n] : ') != 'y'
     return
   endif
   redraw
-  let s:result = system('git branch ' . a:option . ' ' . s:branch_name)
-  exec ":bd!"
-  echo s:result
-  call gbr#gbr()
-endfunction
+  var result = system('git branch ' .. option .. ' ' .. branch_name)
+  execute ':bd!'
+  echo result
+  Gbr()
+enddef
 
-function! s:current_branch_top(branch_list) abort
-  let s:list = []
-  for branch in a:branch_list
-    if branch =~# "*"
-      let s:current = branch
+def CurrentBranchTop(branch_list: list<string>): list<string>
+  var result: list<string> = []
+  var current = ''
+  for branch in branch_list
+    if branch =~# '\*'
+      current = branch
     else
-      call add(s:list, branch)
+      add(result, branch)
     endif
   endfor
-  call insert(s:list, s:current, 0)
-  return s:list
-endfunction
+  insert(result, current, 0)
+  return result
+enddef
 
-function! s:get_target_branch()
-  return substitute(getline("."), '\(^\*\|\s\)', '', 'g')
-endfunction
+def GetTargetBranch(): string
+  return substitute(getline('.'), '\(^\*\|\s\)', '', 'g')
+enddef
 
-function! gbr#create(option) abort
-  let s:new_branch_name = input("Input new-branch-name : ")
-  if s:new_branch_name == ""
+export def Create(option: string)
+  var new_branch_name = input('Input new-branch-name : ')
+  if new_branch_name == ''
     return
   endif
 
   redraw
-  let s:start_point = s:get_target_branch()
-  if a:option ==# "c"
-    let s:result = system('git branch ' . s:new_branch_name . ' ' . s:start_point)
-    if s:result == ""
-      echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'"
+  var start_point = GetTargetBranch()
+  if option ==# 'c'
+    var result = system('git branch ' .. new_branch_name .. ' ' .. start_point)
+    if result == ''
+      echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'"
     endif
-  elseif a:option ==# "cc"
-    let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
-    echo s:result
-    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'"
-  elseif a:option ==# "C"
-    let s:resCheckout = system('git checkout ' . s:start_point)
+  elseif option ==# 'cc'
+    var result = system('git checkout -b ' .. new_branch_name .. ' ' .. start_point)
+    echo result
+    echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'"
+  elseif option ==# 'C'
+    var res_checkout = system('git checkout ' .. start_point)
     if v:shell_error
-      echo s:resCheckout
+      echo res_checkout
       return
     endif
-    let s:resPull = system('git pull')
+    var res_pull = system('git pull')
     if v:shell_error
-      echo s:resPull
+      echo res_pull
       return
     endif
-    let s:result = system('git checkout -b ' . s:new_branch_name . ' ' . s:start_point)
-    echo s:result
-    echo "Created new branch '" . s:new_branch_name . "' from '" . s:start_point . "'\nbefore 'git checkout " . s:start_point . " && git pull'"
+    var result = system('git checkout -b ' .. new_branch_name .. ' ' .. start_point)
+    echo result
+    echo "Created new branch '" .. new_branch_name .. "' from '" .. start_point .. "'\nbefore 'git checkout " .. start_point .. " && git pull'"
   endif
-  exec ":bd!"
-  call gbr#gbr()
-endfunction
+  execute ':bd!'
+  Gbr()
+enddef
 
-function! gbr#rename() abort
-  let s:oldbranch = s:get_target_branch()
-  let s:new_branch_name = input("Rename from '". s:oldbranch . "'\nInput new-branch-name : ")
-  if s:new_branch_name == ""
+export def Rename()
+  var oldbranch = GetTargetBranch()
+  var new_branch_name = input("Rename from '" .. oldbranch .. "'\nInput new-branch-name : ")
+  if new_branch_name == ''
     return
   endif
 
   redraw
-  let s:result = system('git branch -m ' . s:oldbranch . ' ' . s:new_branch_name)
-  if s:result == ""
-    echo "Rename '" . s:new_branch_name . "' from '" . s:oldbranch . "'"
+  var result = system('git branch -m ' .. oldbranch .. ' ' .. new_branch_name)
+  if result == ''
+    echo "Rename '" .. new_branch_name .. "' from '" .. oldbranch .. "'"
   endif
-  exec ":bd!"
-  call gbr#gbr()
-endfunction
+  execute ':bd!'
+  Gbr()
+enddef
 
-function! s:gbr_default_key_mappings()
+def SetDefaultKeyMappings()
   if g:gbr_no_default_key_mappings
     return
   endif
-  nnoremap <silent> <buffer> <CR> :<C-u>call gbr#checkout()<CR>
-  nnoremap <silent> <buffer> c :<C-u>call gbr#create("c")<CR>
-  nnoremap <silent> <buffer> cc :<C-u>call gbr#create("cc")<CR>
-  nnoremap <silent> <buffer> C :<C-u>call gbr#create("C")<CR>
-  nnoremap <silent> <buffer> m :<C-u>call gbr#rename()<CR>
-  nnoremap <silent> <buffer> d :<C-u>call gbr#delete("-d")<CR>
-  nnoremap <silent> <buffer> D :<C-u>call gbr#delete("-D")<CR>
-  nnoremap <silent> <buffer> q :<C-u>bdelete!<CR>
-endfunction
+  nnoremap <silent> <buffer> <CR> <ScriptCmd>Checkout()<CR>
+  nnoremap <silent> <buffer> c <ScriptCmd>Create('c')<CR>
+  nnoremap <silent> <buffer> cc <ScriptCmd>Create('cc')<CR>
+  nnoremap <silent> <buffer> C <ScriptCmd>Create('C')<CR>
+  nnoremap <silent> <buffer> m <ScriptCmd>Rename()<CR>
+  nnoremap <silent> <buffer> d <ScriptCmd>Delete('-d')<CR>
+  nnoremap <silent> <buffer> D <ScriptCmd>Delete('-D')<CR>
+  nnoremap <silent> <buffer> q <Cmd>bdelete!<CR>
+enddef
 
-function! gbr#truncate_branch() abort
-  let s:branch_list = split(substitute(system('git branch'), '\s', '', 'g'), "\n")
-  let s:exclusion_branch = g:gbr_exclusion_branch
-  let s:truncate_branch_list = s:filter_branch(s:branch_list, s:exclusion_branch)
-  if !empty(s:truncate_branch_list)
-    let s:result = system('git branch -d ' . join(s:truncate_branch_list, " "))
-    if bufname("[gbr]") == "[gbr]"
+export def TruncateBranch()
+  var branch_list = split(substitute(system('git branch'), '\s', '', 'g'), "\n")
+  var exclusion_branch: list<any> = g:gbr_exclusion_branch
+  var truncate_branch_list = FilterBranch(branch_list, exclusion_branch)
+  if !empty(truncate_branch_list)
+    var result = system('git branch -d ' .. join(truncate_branch_list, ' '))
+    if bufname('[gbr]') == '[gbr]'
       redraw
-      exec ":bd!"
-      echo s:result
-      call gbr#gbr()
+      execute ':bd!'
+      echo result
+      Gbr()
     else
-      echo s:result
+      echo result
     endif
   else
-    echo "Nothing any target branch..."
+    echo 'Nothing any target branch...'
   endif
-endfunction
+enddef
 
-function! s:filter_branch(truncate_branch, exclusion_branch) abort
-  call filter(a:truncate_branch, 'v:val !~# "*"')
-  if !empty(a:exclusion_branch)
-    call filter(a:truncate_branch, 'index(a:exclusion_branch, v:val) == -1')
+def FilterBranch(truncate_branch: list<string>, exclusion_branch: list<any>): list<string>
+  var branches = copy(truncate_branch)
+  filter(branches, (_, val) => val !~# '\*')
+  if !empty(exclusion_branch)
+    filter(branches, (_, val) => index(exclusion_branch, val) == -1)
   endif
-  return a:truncate_branch
-endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo
+  return branches
+enddef
