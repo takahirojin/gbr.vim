@@ -16,17 +16,19 @@ Tips                                           |gbr-tips|
 ==============================================================================
 USAGE                                                          *gbr-usage*
 
-:Gbr      Showing git-branch in the window.
+:Gbr      Showing git-branch in the popup window.
 	  Following the key mappings, work on the cursor line branch-name
 
           <Enter> switch the branch
           c       create a new branch
-          cc      create and switch a new branch
-	  C       create and switch a new branch from refs/heads/branch-name
+          s       create and switch a new branch
+	  C       checkout, pull, then create and switch a new branch
 	  m       rename a branch (as same as "-m" options)
           d       delete a branch (as same as "-d" options)
           D       delete a branch (as same as "-D" options)
+          t       delete all branches except current (truncate)
 	  q       close branch list
+	  <Esc>   close branch list
 
 
 :GbrTruncateBranch      Delete git-branch exclude current branch.

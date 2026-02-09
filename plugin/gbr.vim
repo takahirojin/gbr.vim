@@ -14,8 +14,8 @@ g:loaded_gbr_vim = 1
 
 import autoload 'gbr.vim' as gbr
 
-g:gbr_no_default_key_mappings = get(g:, 'gbr_no_default_key_mappings', 0)
 g:gbr_window_height           = get(g:, 'gbr_window_height', 15)
+g:gbr_window_width            = get(g:, 'gbr_window_width', 80)
 g:gbr_current_branch_top      = get(g:, 'gbr_current_branch_top', 0)
 g:gbr_exclusion_branch        = get(g:, 'gbr_exclusion_branch', [])
 
