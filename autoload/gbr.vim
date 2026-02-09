@@ -123,7 +123,7 @@ def BuildContent(): list<string>
 
   if popup_mode == 'navigate'
     content->add('')
-    content->add('  CR:checkout c:create s:switch C:pull')
+    content->add('  Enter:checkout c:create s:switch C:pull')
     content->add('  m:rename d:delete D:force t:truncate')
   elseif popup_mode == 'input'
     content->add(MakeSeparator())
