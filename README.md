@@ -7,12 +7,14 @@ Show git branch list
 * Run `:Gbr` to show your local branch list.
 * Press `Enter` to switch branch which you choose.
 * Press `c` to create a new branch.
-* Press `cc` to create and switch a new branch.
-* Press `C` to create and switch a new branch from refs/heads/branch-name
+* Press `s` to create and switch a new branch.
+* Press `C` to checkout, pull, then create and switch a new branch.
 * Press `m` to rename a branch. as same as "-m" options
 * Press `d` to delete a branch. as same as "-d" options
 * Press `D` to delete a branch. as same as "-D" options
+* Press `t` to delete all branches except current (truncate).
 * Press `q` to close branch list.
+* Press `Esc` to close branch list.
 
 * Run `:GbrTruncateBranch` to delete branch exclude current branch
 
