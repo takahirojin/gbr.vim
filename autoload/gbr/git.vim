@@ -6,9 +6,17 @@ vim9script
 # License: MIT License
 # =============================================================================
 
+def EchoLines(text: string)
+  for line in split(text, '\n')
+    if line !=# ''
+      echomsg line
+    endif
+  endfor
+enddef
+
 export def Checkout(branch_name: string)
   var result = system('git checkout ' .. shellescape(branch_name))
-  echomsg result
+  EchoLines(result)
 enddef
 
 export def Create(start_point: string, new_name: string, option: string)
@@ -18,29 +26,29 @@ export def Create(start_point: string, new_name: string, option: string)
     if result == ''
       echomsg "Created '" .. new_name .. "' from '" .. start_point .. "'"
     else
-      echomsg result
+      EchoLines(result)
     endif
   elseif option ==# 's'
     result = system('git checkout -b ' .. shellescape(new_name) .. ' ' .. shellescape(start_point))
     if v:shell_error
-      echomsg result
+      EchoLines(result)
       return
     endif
     echomsg "Created and switched to '" .. new_name .. "' from '" .. start_point .. "'"
   elseif option ==# 'C'
     var res_checkout = system('git checkout ' .. shellescape(start_point))
     if v:shell_error
-      echomsg res_checkout
+      EchoLines(res_checkout)
       return
     endif
     var res_pull = system('git pull')
     if v:shell_error
-      echomsg res_pull
+      EchoLines(res_pull)
       return
     endif
     result = system('git checkout -b ' .. shellescape(new_name) .. ' ' .. shellescape(start_point))
     if v:shell_error
-      echomsg result
+      EchoLines(result)
       return
     endif
     echomsg "Created '" .. new_name .. "' from '" .. start_point .. "' (after pull)"
@@ -52,17 +60,17 @@ export def Rename(oldbranch: string, new_name: string)
   if result == ''
     echomsg "Renamed '" .. oldbranch .. "' to '" .. new_name .. "'"
   else
-    echomsg result
+    EchoLines(result)
   endif
 enddef
 
 export def Delete(branch_name: string, option: string)
   var result = system('git branch ' .. option .. ' ' .. shellescape(branch_name))
-  echomsg result
+  EchoLines(result)
 enddef
 
 export def Truncate(targets: list<string>)
   var escaped = map(copy(targets), (_, v) => shellescape(v))
   var result = system('git branch -d ' .. join(escaped, ' '))
-  echomsg result
+  EchoLines(result)
 enddef
